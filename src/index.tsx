@@ -21,7 +21,7 @@ const router = createHashRouter([
       },
     ],
   },
-], { basename: "/react-some-todo-app" })
+], { basename: "/" })
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
