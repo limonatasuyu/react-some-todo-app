@@ -1,32 +1,23 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./HomePage";
 import CategoryPage from "./CategoryPage";
 import Layout from "./Layout";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
-      {
-        path: "/",
-        element: <HomePage />,
-      },
-      {
-        path: "/category/:categoryName",
-        element: <CategoryPage />,
-      },
-    ],
-  },
-]);
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
 root.render(
-    <RouterProvider router={router} />
+  <Router basename="/react-some-todo-app">
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="category/:categoryName" element={<CategoryPage />} />
+      </Route>
+    </Routes>
+  </Router>
 );
+
