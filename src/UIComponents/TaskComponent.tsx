@@ -1,6 +1,15 @@
 import { TaskInterface, IsDoneRecord } from "../interfaces/TaskInterface";
 import { useEffect } from "react";
 
+function areSameDay(date1: Date, date2: Date) {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
+
 export function TaskComponent({
   task,
   onDelete,
@@ -18,11 +27,12 @@ export function TaskComponent({
     if (!task.monthDays?.length && !task.weekDays?.length) return;
     const isDoneRecordExists = (task.isDone as IsDoneRecord[]).find(
       (IsDoneRecord) =>
-        new Date(IsDoneRecord.date).toISOString() === date.toISOString()
+        areSameDay(new Date(IsDoneRecord.date), new Date(date))
     );
     if (isDoneRecordExists) return;
+    date.setHours(0, 0, 0, 0);
     addIsDoneRecord(date);
-  }, [addIsDoneRecord, date, task.monthDays, task.weekDays, task.isDone]);
+  }, [addIsDoneRecord, date, task.isDone, task.monthDays?.length, task.weekDays?.length]);
 
   return (
     <div
@@ -84,7 +94,7 @@ export function TaskComponent({
                 ? task.isDone
                 : (task.isDone as IsDoneRecord[]).find(
                     (i: IsDoneRecord) =>
-                      new Date(i.date).toISOString() === date.toISOString()
+                      areSameDay(new Date(i.date), new Date(date))
                   )?.isDone
             )}
           />

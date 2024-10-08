@@ -74,20 +74,26 @@ function reducer(state: State, action: Action): State {
     case "MARK_TASK":
       return {
         ...state,
-        tasks: state.tasks.map((task) =>
-          task.id === action.payload.taskId
-            ? typeof task.isDone === "boolean"
-              ? { ...task, isDone: !task.isDone }
-              : {
-                  ...task,
-                  isDone: task.isDone.map((i) =>
-                    i.date === action.payload.date
-                      ? { ...i, isDone: !i.isDone }
-                      : i
-                  ),
-                }
-            : task
-        ),
+        tasks: state.tasks.map((task) => {
+          if (task.id === action.payload.taskId) {
+            if (typeof task.isDone === "boolean") {
+              return { ...task, isDone: !task.isDone };
+            }
+
+            const updatedIsDone = task.isDone.map((i) => {
+              const payloadDate = new Date(action.payload.date);
+              payloadDate.setHours(0, 0, 0, 0);
+              if (new Date(i.date).toISOString() === payloadDate.toISOString()) {
+                return { ...i, isDone: !i.isDone };
+              }
+              return i;
+            });
+
+            return { ...task, isDone: updatedIsDone };
+          }
+
+          return task;
+        }),
       };
     case "ADD_IS_DONE_RECORD":
       return {
@@ -124,7 +130,8 @@ export function useTasks(categoryName: string) {
     localStorage.setItem("tasks", JSON.stringify(state.tasks));
 
     const retrievedCategories = localStorage.getItem("categories");
-    if (!retrievedCategories) localStorage.setItem("categories", JSON.stringify([]))
+    if (!retrievedCategories)
+      localStorage.setItem("categories", JSON.stringify([]));
   }, [state.tasks]);
 
   useEffect(() => {

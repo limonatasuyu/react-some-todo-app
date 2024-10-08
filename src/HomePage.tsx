@@ -13,9 +13,8 @@ export default function HomePage() {
   useEffect(() => {
     const retrievedCategories = localStorage.getItem("categories");
     if (!retrievedCategories) return;
-    //console.log("retrievedCategories: ", retrievedCategories);
     setCategories(JSON.parse(retrievedCategories));
-    setIsCategoriesSet(true);
+    setIsCategoriesSet(() => true);
   }, []);
 
   useEffect(() => {

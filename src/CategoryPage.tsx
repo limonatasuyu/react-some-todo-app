@@ -9,6 +9,10 @@ const Page: React.FC = () => {
   const { state, dispatch } = useTasks(categoryName as string);
 
   const handleAddTodo = useCallback(() => {
+    const date = state.isRegularChosen ? null : state.taskDate;
+    if (date) {
+      date.setHours(0, 0, 0, 0);
+    }
     dispatch({
       type: "ADD_TASK",
       payload: {
@@ -16,7 +20,7 @@ const Page: React.FC = () => {
         name: state.inputValue,
         isDone: state.isRegularChosen ? [] : false,
         category: categoryName as string,
-        date: state.isRegularChosen ? null : state.taskDate,
+        date,
         monthDays: state.selectedMonthDays,
         weekDays: state.selectedWeekDays,
       },
