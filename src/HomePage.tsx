@@ -3,23 +3,33 @@ import { Link } from "react-router-dom";
 import Loader from "./Loader";
 
 export default function HomePage() {
-  const [categories, setCategories] = useState([
+  const defaultCategories = [
     { name: "Work", id: 0 },
     { name: "Health", id: 1 },
-  ]);
+  ];
+
+  const [categories, setCategories] = useState<{ name: string; id: any }[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [isCategoriesSet, setIsCategoriesSet] = useState(false);
-  
+  const [isLoaded, setIsLoaded] = useState(false);
+
   useEffect(() => {
-    const retrievedCategories = localStorage.getItem("categories");
-    if (!retrievedCategories) return;
-    setCategories(JSON.parse(retrievedCategories));
-    setIsCategoriesSet(() => true);
+    const savedCategories = localStorage.getItem("categories");
+
+    if (savedCategories) {
+      setCategories(JSON.parse(savedCategories));
+    } else {
+      setCategories(defaultCategories);
+      localStorage.setItem("categories", JSON.stringify(defaultCategories));
+    }
+
+    setIsLoaded(true);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("categories", JSON.stringify(categories));
-  }, [categories]);
+    if (isLoaded) {
+      localStorage.setItem("categories", JSON.stringify(categories));
+    }
+  }, [categories, isLoaded]);
 
   const handleAddCategory = () => {
     if (inputValue === "") return;
@@ -35,7 +45,6 @@ export default function HomePage() {
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      // Call the function or perform an action when Enter is pressed
       handleAddCategory();
     }
   };
@@ -62,7 +71,7 @@ export default function HomePage() {
         >
           All
         </Link>
-        {!isCategoriesSet ? (
+        {!isLoaded ? (
           <Loader className="w-full py-4" />
         ) : (
           categories.map((i) => (
@@ -81,8 +90,11 @@ export default function HomePage() {
             value={inputValue}
             className="w-full bg-inherit border-none outline-none peer"
             onKeyPress={handleKeyPress}
-          /> 
-          <label htmlFor="new-category-input" className="peer-focus:hidden w-full cursor-text">
+          />
+          <label
+            htmlFor="new-category-input"
+            className="peer-focus:hidden w-full cursor-text"
+          >
             New&nbsp;Category
           </label>
           <svg
@@ -93,7 +105,6 @@ export default function HomePage() {
           >
             <path d="M4 12H20M12 4V20" stroke="#9CA3AF" strokeWidth="2" />
           </svg>
-        
         </div>
       </div>
     </div>
@@ -105,7 +116,7 @@ function CategoryLink({ category, handleDeleteCategory }: any) {
     <Link
       to={`category/${category.name}`}
       className="group/item gap-2 text-white font-medium text-2xl rounded-md bg-[#23CDD3] hover:bg-[#3EFFE2] p-10 items-center flex shadow-lg hover:shadow-xl h-20 w-[48%] justify-center cursor-pointer"
-   > 
+    >
       <span>{category.name}</span>
       <span
         className="invisible group-hover/item:visible"
@@ -115,7 +126,12 @@ function CategoryLink({ category, handleDeleteCategory }: any) {
           handleDeleteCategory(category.id);
         }}
       >
-        <svg viewBox="0 0 256 256" width="30" height="30" aria-label="delete-category-button">
+        <svg
+          viewBox="0 0 256 256"
+          width="30"
+          height="30"
+          aria-label="delete-category-button"
+        >
           <path
             d="M13 3a1 1 0 0 0-1.014 1H6a1 1 0 1 0 0 2h18a1 1 0 1 0 0-2h-5.986A1 1 0 0 0 17 3zM6 8v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"
             transform="scale(8.53333)"
